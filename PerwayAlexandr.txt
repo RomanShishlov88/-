@@ -1,0 +1,63 @@
+package com.perwii.parse.controller;
+
+
+import com.perwii.parse.modei.Parser;
+import com.perwii.parse.repo.MyRepo;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.kafka.config.TopicBuilder;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+@RestController
+public class MyController{
+
+    @Autowired
+    MyRepo myRepo;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    public static HttpURLConnection connection;
+    String url="https://pro-api.coinmarketcap.com/v1/cryptocurrency?access_key=1d696209-05e1-4631-8797-151ea0fa2873&query=123";
+
+    URL obj;
+    StringBuffer res = null;
+
+    {
+        try {
+            obj = new URL(url);
+            connection = (HttpURLConnection) obj.openConnection();
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            res = new StringBuffer();
+
+    while ((line = in.readLine()) != null){
+        res.append(line);
+    }
+
+    in.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    JSONObject pog = new JSONObject(res.toString());
+    int tem = pog.getJSONObject("market").getInt("volume");
+    String temp = "tem " + tem;
+
+
+}
